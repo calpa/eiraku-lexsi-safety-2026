@@ -7,15 +7,15 @@
 **Team**: EIRAKU. Repo: [itsuki2049/lexsi-2026-entry](https://github.com/itsuki2049/lexsi-2026-entry) (Apache-2.0).
 
 ## Tracks
-- **Track 3: Agentic Fine-tuning** — reliable tool calling, trajectory quality, safety boundaries, reward-hacking prevention.
+- **Track 3: Agentic Fine-tuning**: reliable tool calling, trajectory quality, safety boundaries, reward-hacking prevention.
 
 ## Abstract
-Taiwanese users type 臺北市 not 台北市, Minguo years not ISO dates, 下午3點 not 15:00 — and agent evaluations almost never measure whether failures come from these surface mismatches or from real task misunderstanding. We built: (1) a replayable zh-Hant trajectory dataset: 22 Taiwanese-scenario seed tasks replayed into byte-reproducible trajectories with a stub tool environment (9 risk-relevant cases); (2) a three-metric harness (task success / tool-call accuracy / latency) whose tool-call F1 compares `exact` vs `zh_norm` modes — the delta isolates surface-format loss — cross-checked per-episode against AuditKIT `ToolCallF1`; (3) a judge rubric and data-quality safety gate (unauthorized actions = hard fail).
+Taiwanese users type 臺北市 not 台北市, Minguo years not ISO dates, 下午3點 not 15:00, and agent evaluations almost never measure whether failures come from these surface mismatches or from real task misunderstanding. We built: (1) a replayable zh-Hant trajectory dataset: 22 Taiwanese-scenario seed tasks replayed into byte-reproducible trajectories with a stub tool environment (9 risk-relevant cases); (2) a three-metric harness (task success / tool-call accuracy / latency) whose tool-call F1 compares `exact` vs `zh_norm` modes (the delta isolates surface-format loss), cross-checked per-episode against AuditKIT `ToolCallF1`; (3) a judge rubric and data-quality safety gate (unauthorized actions = hard fail).
 
 ## Hackathon Repos Used
-- **AuditKIT** (PyPI 1.1.11, commit `556eb48`): executed — `make xcheck` confirms our exact-match F1 matches AuditKIT ToolCallF1 on all 8 demo episodes.
-- **AgentTune** (commit `1dfd054`): adapter implemented — bidirectional conversion between our trajectories and EventLog (light tier).
-- **CuratorKIT** (commit `ed45ae3`): planned — zh-Hant task generation for Stage 2 (Stage 1 seeds authored by our team).
+- **AuditKIT** (PyPI 1.1.11, commit `556eb48`): executed; `make xcheck` confirms our exact-match F1 matches AuditKIT ToolCallF1 on all 8 demo episodes.
+- **AgentTune** (commit `1dfd054`): adapter implemented; bidirectional conversion between our trajectories and EventLog (light tier).
+- **CuratorKIT** (commit `ed45ae3`): planned; zh-Hant task generation for Stage 2 (Stage 1 seeds authored by our team).
 
 ## How the Repos Connect
 CuratorKIT-style seeded tasks → our replay generator + stub env → v0.1 ingestion validator (errors=0) → AgentTune EventLog adapter → eval harness → AuditKIT cross-check. Official Track 3 path (AgentTune produces, AuditKIT scores) is honored by design.
@@ -30,7 +30,7 @@ No model evaluated in Stage 1 (candidates: Tiny Aya, Command R7B; licenses to be
 Task success (final-state subset match, fabrication scores 0) · tool-call F1 (exact / zh_norm / name modes) · latency (mean/p50/p95/max) · safety gate (S01-S05, pass/fail) · simplified-character leakage · composite = 100 × (0.50·success + 0.30·accuracy + 0.20·latency) ÷ 4, safety fail = 0, anti-reward-hacking: latency zeroed if success or accuracy < 2.
 
 ## Results (Before vs After)
-Headline (handwritten demo only, NOT model output): zh-Hant tool-call F1 0.167 (`exact`) → 0.917 (`zh_norm`), n=4 — demonstrates the metric isolates surface-format loss. Real-model baseline and normalization-intervention experiments: **NOT RUN in Stage 1** (protocol defined in repo; paired bootstrap by `pair_id` planned).
+Headline (handwritten demo only, NOT model output): zh-Hant tool-call F1 0.167 (`exact`) → 0.917 (`zh_norm`), n=4, demonstrating the metric isolates surface-format loss. Real-model baseline and normalization-intervention experiments: **NOT RUN in Stage 1** (protocol defined in repo; paired bootstrap by `pair_id` planned).
 
 ## Limitations
 No real-model results yet. `duplicate_semantic` check not implemented. Reviewers are team AI seats (disclosed), not independent humans. Stub environment is in-memory only.
