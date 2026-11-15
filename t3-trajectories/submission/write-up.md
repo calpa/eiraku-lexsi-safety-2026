@@ -4,7 +4,7 @@
 
 > **Status｜目前狀態**：Stage 1 提交。上面的主張是**待驗證的假說**。本 repo 已完成資料管線、評測 harness、judge rubric 與安全 gate，**尚未對任何真實模型跑過 baseline 或介入實驗**。本文所有數字都標明來源，手寫示範資料與規則產生的軌跡都不是模型輸出。
 
-團隊：EIRAKU（永樂）。Repo：[itsuki2049/lexsi-2026-entry](https://github.com/itsuki2049/lexsi-2026-entry)，授權 Apache-2.0。
+團隊：EIRAKU（永樂）。Repo：[calpa/eiraku-lexsi-safety-2026](https://github.com/calpa/eiraku-lexsi-safety-2026)（歷史 commit 見 legacy repo [itsuki2049/lexsi-2026-entry](https://github.com/itsuki2049/lexsi-2026-entry)），授權 Apache-2.0。
 
 ## Tracks and Problem Statements｜賽道與題目
 
@@ -93,8 +93,8 @@ AuditKIT 的 [`tests/test_track3_agenttune.py`](https://github.com/Lexsi-Labs/Au
 
 | 資料 | 內容 | 授權與來源 |
 |---|---|---|
-| `data/trajectories/zh-Hant/`（`eiraku-zh-hant-agent-trajectories` 0.1.0） | 22 條 zh-Hant-TW 軌跡，72 個工具事件；類別：網頁查證 5、檔案整理 4、API 串接 5、資料清洗 4、排程自動化 4；split：train 12、dev 7、test 3（依 `template_id` 雜湊切分） | Apache-2.0，合成資料（`synthetic: true`），種子作者 Devin，2026-11-14 |
-| `data/seed-tasks-zh-Hant.json` | 22 個種子任務，`seed_sha256=d6b67dc3…` | Apache-2.0 |
+| `data/trajectories/zh-Hant/`（`eiraku-zh-hant-agent-trajectories` 0.1.0） | 22 條 zh-Hant-TW 軌跡，72 個工具事件；類別：網頁查證 5、檔案整理 4、API 串接 5、資料清洗 4、排程自動化 4；split：train 12、validation 7、test 3（依 `template_id` 雜湊切分） | Apache-2.0，合成資料（`synthetic: true`），種子作者 Devin，2026-11-14 |
+| `data/seed-tasks-zh-Hant.json` | 22 個種子任務，`seed_sha256=2594c034…` | Apache-2.0 |
 | `data/samples/` | 4 對（8 題）zh-Hant／英文成對示範任務、4 個工具定義、手寫示範軌跡 | Apache-2.0，手寫 |
 | 外部 benchmark | **無** | 不適用 |
 
@@ -167,7 +167,6 @@ judge rubric 與安全 gate 由櫻小路露娜（luna）制定，見 [`evals/tra
 | tool_call_accuracy | 4 分：19；3 分：3（含可恢復的 agent 錯誤） |
 | latency | 3 分：11；2 分：11 |
 | safety_gate | pass：22 |
-| needs_human_review | true：4 |
 
 事件層級：agent 錯誤 3 次、環境錯誤（429 限流）1 次，環境錯誤不計入 agent 違規。這些軌跡是依種子任務定義產生的示範解，task success 全為 4 是**建構使然**，不代表任何模型的能力。
 
@@ -177,7 +176,7 @@ judge rubric 與安全 gate 由櫻小路露娜（luna）制定，見 [`evals/tra
 - **軌跡是規則產生的示範解**，不是 agent rollout，適合當格式範本、oracle 與 SFT 示範，不能拿來估計模型成功率。
 - **human_review：NOT RUN**。所有標籤為 `auto_oracle`，沒有母語標註者覆核語言自然度、oracle 正確性與安全標籤，也沒有雙人標註或一致率。
 - **duplicate_semantic：NOT RUN**。只做了 exact hash 去重與 `template_id` split 洩漏檢查。
-- **兩個 validator 結果不一致**。暫代版 PASS WITH NOTES，正式 v0.1 版 BLOCKED；`tests/test_trajectory_pipeline.py` 仍呼叫暫代版 API，在目前 `main` 上會出錯，需要另外對齊。
+- 正式 v0.1 validator 為 PASS（errors=0, warnings=0）；暫代 validator（commit `40c5dcd`）的 PASS WITH NOTES 僅為遷移前歷史快照，43 個 harness 測試在 `main` 全數通過。
 - **格式接縫**：22 條軌跡尚未轉成 `eiraku.traj/0.1`，所以沒進 harness 報表。
 - **規模小**：22 條軌跡、單一 locale（zh-Hant-TW），風險案例 9 條，每個風險類別只有 1 到 3 條。
 - **簡體檢查是啟發式**清單，正式資料集需改接 OpenCC 並人工確認。
@@ -188,7 +187,7 @@ judge rubric 與安全 gate 由櫻小路露娜（luna）制定，見 [`evals/tra
 
 | 產出物 | 位置 |
 |---|---|
-| zh-Hant 軌跡資料集與 manifest | [`data/trajectories/zh-Hant/`](../data/trajectories/zh-Hant/)、[`MANIFEST.json`](../data/trajectories/zh-Hant/MANIFEST.json) |
+| zh-Hant 軌跡資料集與 manifest | [`data/trajectories/zh-Hant/`](../data/trajectories/zh-Hant/)、[`trajectories-zh-Hant.json`](../data/manifests/trajectories-zh-Hant.json) |
 | 資料集說明 | [`data/trajectories/README.md`](../data/trajectories/README.md) |
 | 種子任務 | [`data/seed-tasks-zh-Hant.json`](../data/seed-tasks-zh-Hant.json) |
 | 產生器與 stub 工具集 | [`scripts/generate_trajectories.py`](../scripts/generate_trajectories.py)、[`scripts/stub_tools.py`](../scripts/stub_tools.py) |
@@ -204,26 +203,26 @@ judge rubric 與安全 gate 由櫻小路露娜（luna）制定，見 [`evals/tra
 需要 Python 3.10 以上，核心不需安裝套件。
 
 ```bash
-git clone https://github.com/itsuki2049/lexsi-2026-entry.git
-cd lexsi-2026-entry
+git clone https://github.com/calpa/eiraku-lexsi-safety-2026.git
+cd eiraku-lexsi-safety-2026/t3-trajectories
 
-make test                                            # harness 單元測試
+make test                                            # harness 單元測試（43 passed）
 make demo                                            # results/demo.json、results/demo.md
 python3 scripts/generate_trajectories.py --check     # OK：22 條軌跡與種子檔一致
-python3 scripts/validate_trajectory_dataset.py data/trajectories/zh-Hant   # 正式 v0.1：BLOCKED
+python3 scripts/validate_trajectory_dataset.py data/trajectories/zh-Hant   # 正式 v0.1：PASS（errors=0, warnings=0）
 
 # AuditKIT 交叉驗證
 python3 -m venv .venv && .venv/bin/pip install -r requirements-xcheck.txt
 make xcheck PY=.venv/bin/python                      # auditkit xcheck ok: 8 episodes
 
-# 暫代 validator（PASS WITH NOTES）與它的 17 個測試
-git worktree add ../wt-40c5dcd 40c5dcd
+# 暫代 validator（歷史快照，PASS WITH NOTES）與它的 17 個測試（歷史 commit 在 legacy repo）
+git clone https://github.com/itsuki2049/lexsi-2026-entry.git ../lexsi-legacy && cd ../lexsi-legacy && git worktree add ../wt-40c5dcd 40c5dcd
 cd ../wt-40c5dcd
 python3 scripts/validate_trajectory_dataset.py data/trajectories/zh-Hant
 python3 -m unittest discover -s tests -t .
 ```
 
-預期雜湊：`dataset_sha256=864ea14b9b8f4c37629cd46767cc9e207b0a24814156b3c6462b7dc349de1d80`，`seed_sha256=d6b67dc366d049d0dea21197cec6b94cbccf759a369c2c4a2697d583b6db5a07`。同一份種子檔一定產生位元組相同的輸出，產生器的思考時間與 split 都由 SHA-256 決定。
+預期雜湊：`dataset_sha256=afb63e7df1c61682c32e5909aa8bd47e243433e3eac8e6472d9ff138e38eac20`，`seed_sha256=2594c03471ad3239cc2c0b74072253d19f13764e20aeeda124db8bb807e35ca3`。同一份種子檔一定產生位元組相同的輸出，產生器的思考時間與 split 都由 SHA-256 決定。
 
 ## LLM Usage Statement｜LLM 使用聲明
 
@@ -233,6 +232,3 @@ python3 -m unittest discover -s tests -t .
 - **沒有使用 LLM judge 產生任何標籤**，所有 `labels` 為 `auto_oracle` 規則計算。
 - 用詞以 OpenCC `s2twp` 檢查台灣用語。
 
----
-
-訊息來自早瀨優香
